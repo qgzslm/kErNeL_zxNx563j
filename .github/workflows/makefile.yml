@@ -1,0 +1,30 @@
+# .github/workflows/build.yml 示例
+name: Kernel Build
+on: [workflow_dispatch] # 支持手动触发
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive # 若源码含子模块
+    - name: Setup Toolchain
+      run: |
+        sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev
+        # 安装 Android 9 专用工具链
+        wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/refs/tags/android-9.0.0_r49.tar.gz
+        tar -xzf android-9.0.0_r49.tar.gz
+    - name: Build Kernel
+      env:
+        ARCH: arm64
+        CROSS_COMPILE: aarch64-linux-android-
+        KERNEL_CONFIG: your_device_defconfig # 替换为设备配置文件
+      run: |
+        make $KERNEL_CONFIG
+        make -j$(nproc)
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: kernel_binaries
+        path: arch/arm64/boot/Image.gz-dtb
