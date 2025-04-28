@@ -19,7 +19,7 @@ jobs:
       env:
         ARCH: arm64
         CROSS_COMPILE: aarch64-linux-android-
-        KERNEL_CONFIG: your_device_defconfig # 替换为设备配置文件
+        KERNEL_CONFIG: atomlld_nx563j_defconfig # 替换为设备配置文件
       run: |
         make $KERNEL_CONFIG
         make -j$(nproc)
